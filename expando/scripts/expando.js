@@ -21,8 +21,8 @@ function initializeExpando() {
   var shrunk = false;
   container.addEventListener('click', function() {
     console.log('clicked');
-    container.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
-    nested.style.animation = 'antiexpando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+    container.style.animation = 'antiexpando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+    nested.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     shrunk = !shrunk;
   });
   container.addEventListener('animationend', function() {
