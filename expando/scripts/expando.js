@@ -15,32 +15,61 @@
  *
  */
 
-function calculateKeyframes(expandedSize, nestedSize) {
-  var scaleStep = 1 / (expandedSize / nestedSize);
+
+function initializeCSSNode() {
+  var sheet = document.createElement('style');
+  sheet.id = 'expando-css';
+  sheet.type = 'text/css';
+  document.body.appendChild(sheet);
+
+  var styleSheetList = document.styleSheets;
+  for (var i=0; i < document.styleSheets.length; i++){
+    var styleSheet = document.styleSheets[i];
+    if (styleSheet === sheet.sheet) {
+      console.log('Found my inserted sheet!');
+      return styleSheet;
+    }
+  }
+
+  console.log('Found nothing :(');
+  return null;
+}
+
+function calculateKeyframes(styleSheet, expandedSize, nestedSize) {
+  var scaleStep = 1 / Math.ceil(expandedSize / nestedSize);
+
+  var cssToInsert = '@keyframes antiexpando {\n';
   var count = 20;
-  var keyframes = '';
   for (var i = 0; i <= count; i++) {
     var scale = (i / count) * (scaleStep - 1) + 1;
     var counterScale = 1 / scale;
-    keyframes += ((i / count) * 100) + '% {transform: scale(' + counterScale + ');}' + '\n';
+    cssToInsert += '  ' + Math.round(((i / count) * 100)) + '% {transform: scale(' + counterScale.toFixed(2) + ');}' + '\n';
   }
-  console.log(keyframes);
+  cssToInsert += '}\n';
+  console.log('Adding rule: ' + cssToInsert);
+  styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 
-  var otherframes = '';
-  otherframes += '0% { transform: scale(1); opacity: 1; }\n';
-  otherframes += '0% { transform: scale(' + scaleStep + '); opacity: 0; }\n';
-  console.log(otherframes);
+  cssToInsert = '@keyframes expando {\n';
+  cssToInsert += '  0% { transform: scale(1); opacity: 1; }\n';
+  cssToInsert += '  100% { transform: scale(' + scaleStep.toFixed(1) + '); opacity: 0; }\n';
+  cssToInsert += '}\n';
+  console.log('Adding rule: ' + cssToInsert);
+  styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 
-  otherframes = '';
-  otherframes += '0% { transform: scale(1); opacity: 0; }\n';
-  otherframes += '0% { transform: scale(' + scaleStep + '); opacity: 1; }\n';
-  console.log(otherframes);
+  cssToInsert = '@keyframes expando2 {\n';
+  cssToInsert += '0% { transform: scale(1); opacity: 0; }\n';
+  cssToInsert += '100% { transform: scale(' + scaleStep.toFixed(1) + '); opacity: 1; }\n';
+  cssToInsert += '}\n';
+  console.log('Adding rule: ' + cssToInsert);
+  styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 }
 
 function initializeExpando(expandoContainer, shrunkContent, expandedContent) {
+  var styleSheet = initializeCSSNode();
+
   // Correct math?
   var reqRadius = Math.sqrt(Math.pow(expandedContent.offsetHeight, 2) + Math.pow(expandedContent.offsetWidth, 2));
-  calculateKeyframes(reqRadius, Math.min(expandoContainer.offsetHeight, expandoContainer.offsetWidth));
+  calculateKeyframes(styleSheet, reqRadius, Math.min(expandoContainer.offsetHeight, expandoContainer.offsetWidth));
 
   var shrunk = false;
   expandoContainer.addEventListener('click', function() {
