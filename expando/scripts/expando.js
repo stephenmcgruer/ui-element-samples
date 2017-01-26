@@ -18,18 +18,24 @@
 function initializeExpando() {
   var container = document.querySelector('.container');
   var nested = document.querySelector('.img-container');
+  var expanded = document.querySelector('.expanded-container');
   var shrunk = false;
   container.addEventListener('click', function() {
     console.log('clicked');
     container.style.animation = 'antiexpando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     nested.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+    expanded.style.animation = 'expando2 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     shrunk = !shrunk;
   });
   container.addEventListener('animationend', function() {
     console.log('done');
     container.style.transform = getComputedStyle(container).transform;
     nested.style.transform = getComputedStyle(nested).transform;
+    expanded.style.transform = getComputedStyle(expanded).transform;
+    nested.style.opacity = getComputedStyle(nested).opacity;
+    expanded.style.opacity = getComputedStyle(expanded).opacity;
     container.style.animation = '';
     nested.style.animation = '';
+    expanded.style.animation = '';
   });
 }
