@@ -15,27 +15,52 @@
  *
  */
 
-function initializeExpando() {
-  var container = document.querySelector('.container');
-  var nested = document.querySelector('.img-container');
-  var expanded = document.querySelector('.expanded-container');
+function calculateKeyframes(expandedSize, nestedSize) {
+  var scaleStep = 1 / (expandedSize / nestedSize);
+  var count = 20;
+  var keyframes = '';
+  for (var i = 0; i <= count; i++) {
+    var scale = (i / count) * (scaleStep - 1) + 1;
+    var counterScale = 1 / scale;
+    keyframes += ((i / count) * 100) + '% {transform: scale(' + counterScale + ');}' + '\n';
+  }
+  console.log(keyframes);
+
+  var otherframes = '';
+  otherframes += '0% { transform: scale(1); opacity: 1; }\n';
+  otherframes += '0% { transform: scale(' + scaleStep + '); opacity: 0; }\n';
+  console.log(otherframes);
+
+  otherframes = '';
+  otherframes += '0% { transform: scale(1); opacity: 0; }\n';
+  otherframes += '0% { transform: scale(' + scaleStep + '); opacity: 1; }\n';
+  console.log(otherframes);
+}
+
+function initializeExpando(expandoContainer, shrunkContent, expandedContent) {
+  // Correct math?
+  var reqRadius = Math.sqrt(Math.pow(expandedContent.offsetHeight, 2) + Math.pow(expandedContent.offsetWidth, 2));
+  calculateKeyframes(reqRadius, Math.min(expandoContainer.offsetHeight, expandoContainer.offsetWidth));
+
   var shrunk = false;
-  container.addEventListener('click', function() {
-    console.log('clicked');
-    container.style.animation = 'antiexpando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
-    nested.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
-    expanded.style.animation = 'expando2 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+  expandoContainer.addEventListener('click', function() {
+    expandoContainer.style.animation = 'antiexpando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+    shrunkContent.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
+    expandedContent.style.animation = 'expando2 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     shrunk = !shrunk;
   });
-  container.addEventListener('animationend', function() {
-    console.log('done');
-    container.style.transform = getComputedStyle(container).transform;
-    nested.style.transform = getComputedStyle(nested).transform;
-    expanded.style.transform = getComputedStyle(expanded).transform;
-    nested.style.opacity = getComputedStyle(nested).opacity;
-    expanded.style.opacity = getComputedStyle(expanded).opacity;
-    container.style.animation = '';
-    nested.style.animation = '';
-    expanded.style.animation = '';
+
+  expandoContainer.addEventListener('animationend', function() {
+    // Set the transform and opacity, to make the animation concrete.
+    expandoContainer.style.transform = getComputedStyle(expandoContainer).transform;
+    shrunkContent.style.transform = getComputedStyle(shrunkContent).transform;
+    expandedContent.style.transform = getComputedStyle(expandedContent).transform;
+    shrunkContent.style.opacity = getComputedStyle(shrunkContent).opacity;
+    expandedContent.style.opacity = getComputedStyle(expandedContent).opacity;
+
+    // We are done animating.
+    expandoContainer.style.animation = '';
+    shrunkContent.style.animation = '';
+    expandedContent.style.animation = '';
   });
 }
