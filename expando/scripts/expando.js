@@ -41,25 +41,26 @@ function calculateKeyframes(styleSheet, expandedSize, nestedSize) {
   var cssToInsert = '@keyframes antiexpando {\n';
   var count = 20;
   for (var i = 0; i <= count; i++) {
+    var percentage = Math.round(((i / count) * 100));
     var scale = (i / count) * (scaleStep - 1) + 1;
-    var counterScale = 1 / scale;
-    cssToInsert += '  ' + Math.round(((i / count) * 100)) + '% {transform: scale(' + counterScale.toFixed(2) + ');}' + '\n';
+    var counterScale = (1 / scale).toFixed(2);
+    cssToInsert += `  ${percentage}% {transform: scale(${counterScale});}\n`;
   }
   cssToInsert += '}\n';
   console.log('Adding rule: ' + cssToInsert);
   styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 
-  cssToInsert = '@keyframes expando {\n';
-  cssToInsert += '  0% { transform: scale(1); opacity: 1; }\n';
-  cssToInsert += '  100% { transform: scale(' + scaleStep.toFixed(1) + '); opacity: 0; }\n';
-  cssToInsert += '}\n';
+  cssToInsert = `@keyframes expando {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(${scaleStep.toFixed(1)}); opacity: 0; }
+  }`;
   console.log('Adding rule: ' + cssToInsert);
   styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 
-  cssToInsert = '@keyframes expando2 {\n';
-  cssToInsert += '0% { transform: scale(1); opacity: 0; }\n';
-  cssToInsert += '100% { transform: scale(' + scaleStep.toFixed(1) + '); opacity: 1; }\n';
-  cssToInsert += '}\n';
+  cssToInsert = `@keyframes expando2 {
+    0% { transform: scale(1); opacity: 0; }
+    100% { transform: scale(${scaleStep.toFixed(1)}); opacity: 1; }
+  }`;
   console.log('Adding rule: ' + cssToInsert);
   styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 }
