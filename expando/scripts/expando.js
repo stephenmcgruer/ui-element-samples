@@ -64,12 +64,17 @@ function calculateKeyframes(styleSheet, expandedSize, nestedSize) {
   styleSheet.insertRule(cssToInsert, styleSheet.cssRules.length);
 }
 
-function initializeExpando(expandoContainer, shrunkContent, expandedContent) {
+function initializeExpando(expandoWrapper, expandoContainer, shrunkContent, expandedContent) {
   var styleSheet = initializeCSSNode();
 
   // Correct math?
   var reqRadius = Math.sqrt(Math.pow(expandedContent.offsetHeight, 2) + Math.pow(expandedContent.offsetWidth, 2));
   calculateKeyframes(styleSheet, reqRadius, Math.min(expandoContainer.offsetHeight, expandoContainer.offsetWidth));
+
+  var shrunkWidth = getComputedStyle(shrunkContent).width;
+  var shrunkHeight = getComputedStyle(shrunkContent).height;
+  var expandedWidth = getComputedStyle(expandedContent).width;
+  var expandedHeight = getComputedStyle(expandedContent).height;
 
   var shrunk = false;
   expandoContainer.addEventListener('click', function() {
@@ -77,6 +82,12 @@ function initializeExpando(expandoContainer, shrunkContent, expandedContent) {
     shrunkContent.style.animation = 'expando 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     expandedContent.style.animation = 'expando2 120ms linear' + (shrunk ? ' reverse': '') + ' forwards';
     shrunk = !shrunk;
+
+    // Clip.
+    if (shrunk) {
+      expandoWrapper.style.width = expandedWidth;
+      expandoWrapper.style.height = expandedHeight;
+    }
   });
 
   expandoContainer.addEventListener('animationend', function() {
@@ -91,5 +102,11 @@ function initializeExpando(expandoContainer, shrunkContent, expandedContent) {
     expandoContainer.style.animation = '';
     shrunkContent.style.animation = '';
     expandedContent.style.animation = '';
+
+    // Clip
+    if (!shrunk) {
+      expandoWrapper.style.width = shrunkWidth;
+      expandoWrapper.style.height = shrunkHeight;
+    }
   });
 }
